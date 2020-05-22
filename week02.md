@@ -151,9 +151,9 @@ class OwnerController {
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
 ```
-- ContextLoaderListner는 ServletContextListenr 인터페이스를 구현하고 있으며, ApplicationContext를 생성하는 역할을 합니다. (정확히는 ContextLoaderListner 내부에 부모객체로 존재하는 ContextLoader가 ApplicationContext는 생성합니다.)
-3. 생성된 ContextLoaderListener 는 applicationContext.xml을 로딩하여 스프링 IoC Container에 해당하는 ApplicationContext 생성합니다.
-- 또한 applicationContext.xml 에 등록된 bean들이 생성되어 IoC Container에 저장됩니다.
+- ContextLoaderListner는 ServletContextListenr 인터페이스를 구현하고 있으며, Root Application Context를 생성하는 역할을 합니다. (정확히는 ContextLoaderListner 내부에 부모객체로 존재하는 ContextLoader가 Root Application Context는 생성합니다.)
+3. 생성된 ContextLoaderListener 는 applicationContext.xml을 로딩하여 스프링 IoC Container에 해당하는 Root Application Context 생성합니다.
+- 또한 applicationContext.xml 에 등록된 bean들이 생성되어 Root Applicatoin Context에 저장됩니다.
 - 이때 생성되는 bean들은 웹과 관련없는 객체들입니다.
 - 예를 들어, DB에 접근하기 위한 객체인 repository나 databaseDataSource 클래스 객체를 생성합니다.
 - applicationContext.xml 코드 예시입니다.
@@ -198,8 +198,8 @@ class OwnerController {
 	
 ```
 - 이는 DispatcherServlet이 요청을 받았을 때 base-package 범위에서 @Controller 어노테이션으로 지정된 것을 스캔한다는 코드입니다.
-- 따라서 아래와 같이 base-pachage에 속한 클래스의 선언부에 @Controller 어노테이션을 추가하면 해당 클래스는 스캔이 되어 싱글톤 형태의 객체로 생성됩니다. 그리고 새성된 객체는 ApplicationContext(IoC 컨테이너)에 저장됩니다.
-- dispatcher-servlet.xml에서 설정한 anntation 뿐만 아니라, 여러 anntaion 을 스캔합니다. 그 중 하나가 @Autowired라는 어노테이션입니다. @Autowired이 지정된 변수에 Root Applicatoin Context 에 존재하는 객체를 가져다가 넣게 됩니다. 즉, @Autiwired가 지정된 변수에 의존성 주입이 일어납니다.  
+- 따라서 아래와 같이 base-package에 속한 클래스의 선언부에 @Controller 어노테이션을 추가하면 해당 클래스는 스캔이 되어 싱글톤 형태의 객체로 생성됩니다. 그리고 생성된 객체는 Web Application Context(IoC 컨테이너)에 저장됩니다.
+- dispatcher-servlet.xml에서 설정한 anntation 뿐만 아니라, 여러 annotaion 을 스캔합니다. 그 중 하나가 @Autowired라는 어노테이션입니다. @Autowired이 지정된 변수에 Root Applicatoin Context 에 존재하는 객체를 가져다가 넣게 됩니다. 즉, @Autowired가 지정된 변수에 의존성 주입이 일어납니다.  
 - 또한 @RequestMapping 이라는 annotaion 을 만나게 되면, Handler Mapping을 하게 됩니다.   
 즉, 어떤 요청이 올 때 어떤 메서드를 실행하는지 맵핑 테이블을 만들게 됩니다.  
 개발자는 @RequestMapping 어노테이션을 이용하여 요청 URL 과 메소드를 연결하고, 해당 메소드에 수행할 작업을 작성하면됩니다. 
