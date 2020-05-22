@@ -173,8 +173,39 @@ class OwnerController {
 - 위에서는 @Repository, @Service, @Component 어노테이션이 붙은 클래스를 스캔하여 bean으로 생성한다는 의미입니다.
 - 여기까지가 톰캣이 시작될 때 수행되는 과정입니다.
 
-4. 클라이언트로 부터 요청이 들어오면, 만약 이 요청이 첫번째로 들어온 요청인 경우,  web.xml 에 설정된 dispatcherServelet(serlet)을 생성합니다.
-- 
+4. 클라이언트로 부터 요청이 들어오면, 요청이 들어온 url 을 보고 해당 <servelt-mappring> 태그를 참조하여 요청에 대응하는 servlet을 맵핑시켜줍니다.
+- web.xml 의 servlet 관련 코드
+	
+```
+<servlet>
+        <servlet-name>dispatcher</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>dispatcher</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+```
+- web.xml에는 <servlet> 태그를 통해서 사용할 dispatcher가 설정되어있습니다.
+- 위에서는 url-pattern이 /인것이 dispatcher 서블렛으로 지정되어있기 때문에 모든 요청이 dispatcher 서블렛과 맵핑됩니다.
+- 만약 해당 서블릿으로 요청이 처음들어온 경우라면, servel-name에 해당하는 dispatcher뒤에 -servlet.xml이 붙은 dispatcher-servlet.xml 파일을 읽어드립니다.
+- dispatcher-servlet.xml 에는 아래와 같은 내용을 담고 있습니다.
+
+```
+<mvc:annotation-driven></mvc:annotation-driven> <!-- Annotation 활성화 -->
+    <context:component-scan base-package="Controller"/><!-- Component 패키지 지정 -->
+	
+```
+- 이는 DispatcherServlet이 요청을 받았을 때 base-package 범위에서 @Controller 어노테이션으로 지정된 것을 스캔한다는 코드입니다.
+- 따라서 아래와 같이 base-pachage에 속한 클래스의 선언부에 @Controller 어노테이션을 추가하면 해당 클래스는 스캔이 되어 싱글톤 형태의 객체로 생성됩니다. 그리고 새성된 객체는 ApplicationContext(IoC 컨테이너)에 저장됩니다.
+- dispatcher-servlet.xml에서 설정한 anntation 뿐만 아니라, 여러 anntaion 을 스캔합니다. 그 중 하나가 @Autowired라는 어노테이션입니다. @Autowired이 지정된 변수에 Root Applicatoin Context 에 존재하는 객체를 가져다가 넣게 됩니다. 즉, @Autiwired가 지정된 변수에 의존성 주입이 일어납니다.  
+- 또한 @RequestMapping 이라는 annotaion 을 만나게 되면, Handler Mapping을 하게 됩니다.   
+즉, 어떤 요청이 올 때 어떤 메서드를 실행하는지 맵핑 테이블을 만들게 됩니다.  
+개발자는 @RequestMapping 어노테이션을 이용하여 요청 URL 과 메소드를 연결하고, 해당 메소드에 수행할 작업을 작성하면됩니다. 
+(보통 Controller의 메소드에 @RequestMapping 어노테이션이 
+
+
 
 톰캣이 실행되면 톰캣의 설정 파일에 해당하는 web.xml을 읽고 개발자는 톰캣의 설정 파일인 web.xml에 <context-param> 태그를 이용하여 applicatonContext.xml의 경로를 전역변수 contextConfigLocation로 만듭니다.
 (applicationContext.xml은 IoC Container에서 관리할 객체들을 지정해놓은 파일입니다.)
