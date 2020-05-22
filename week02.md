@@ -203,15 +203,20 @@ class OwnerController {
 - 또한 @RequestMapping 이라는 annotaion 을 만나게 되면, Handler Mapping을 하게 됩니다.   
 즉, 어떤 요청이 올 때 어떤 메서드를 실행하는지 맵핑 테이블을 만들게 됩니다.  
 개발자는 @RequestMapping 어노테이션을 이용하여 요청 URL 과 메소드를 연결하고, 해당 메소드에 수행할 작업을 작성하면됩니다. 
-(보통 Controller의 메소드에 @RequestMapping 어노테이션이 
-
-
-
-톰캣이 실행되면 톰캣의 설정 파일에 해당하는 web.xml을 읽고 개발자는 톰캣의 설정 파일인 web.xml에 <context-param> 태그를 이용하여 applicatonContext.xml의 경로를 전역변수 contextConfigLocation로 만듭니다.
-(applicationContext.xml은 IoC Container에서 관리할 객체들을 지정해놓은 파일입니다.)
-	
-
-
+(보통 Controller의 메소드에 @RequestMapping 어노테이션이 쓰이기 때문에, 해당 메소드에서 수행할 로직은 주로 데이터를 받아와서 뷰페이지에 전달하는 로직입니다.)  
+```
+@Controller
+class OwnerController {
+	private static final String VIEWS_OWNER_CREATE_OR_UPDATE_FORM = "owners/createOrUpdateOwnerForm";
+	@GetMapping("/owners/new")
+	public String initCreationForm(Map<String, Object> model) {
+		Owner owner = new Owner();
+		model.put("owner", owner);
+		return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
+	}
+}
+```
+- MappingTable이 생성된 이후 들어오는 요청은 DispatcherServlet이 service() 메서드를 실행하여 HandlerMapping에게 질의를 합니다. HanldlerMapping에 대한 질의 결과를 통해 요청을 메소드에게 mapping시킵니다.
 
 
 > 참고 : 
