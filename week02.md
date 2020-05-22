@@ -198,8 +198,11 @@ class OwnerController {
 	
 ```
 - 이는 DispatcherServlet이 요청을 받았을 때 base-package 범위에서 @Controller 어노테이션으로 지정된 것을 스캔한다는 코드입니다.
+
 - 따라서 아래와 같이 base-package에 속한 클래스의 선언부에 @Controller 어노테이션을 추가하면 해당 클래스는 스캔이 되어 싱글톤 형태의 객체로 생성됩니다. 그리고 생성된 객체는 Web Application Context(IoC 컨테이너)에 저장됩니다.
+
 - dispatcher-servlet.xml에서 설정한 anntation 뿐만 아니라, 여러 annotaion 을 스캔합니다. 그 중 하나가 @Autowired라는 어노테이션입니다. @Autowired이 지정된 변수에 Root Applicatoin Context 에 존재하는 객체를 가져다가 넣게 됩니다. 즉, @Autowired가 지정된 변수에 의존성 주입이 일어납니다.  
+
 - 또한 @RequestMapping 이라는 annotaion 을 만나게 되면, Handler Mapping을 하게 됩니다.   
 즉, 어떤 요청이 올 때 어떤 메서드를 실행하는지 맵핑 테이블을 만들게 됩니다.  
 개발자는 @RequestMapping 어노테이션을 이용하여 요청 URL 과 메소드를 연결하고, 해당 메소드에 수행할 작업을 작성하면됩니다. 
