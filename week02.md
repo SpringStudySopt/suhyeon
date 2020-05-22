@@ -151,19 +151,34 @@ class OwnerController {
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
 ```
-- ContextLoaderListner는 ServletContextListenr 인터페이스를 구현하고 있으며, ApplicationContext를 생성하는 역할을 합니다.
-3. 생성된 ContextLoaderListener 는 root-context.xml을 loading 합니다.
-- root-context.xml에 등록되어있는 Root Application Context 컨테이너가 생성됩니다.
-- 이 Container는 root-context.xml(우리 프로젝트에서는 applicationContext.xml에 해당)에 지정되어있는 bean들을 생성하여 저장합니다.
-- 주로 이 bean들은 웹과 관련없는 객체들입니다.
+- ContextLoaderListner는 ServletContextListenr 인터페이스를 구현하고 있으며, ApplicationContext를 생성하는 역할을 합니다. (정확히는 ContextLoaderListner 내부에 부모객체로 존재하는 ContextLoader가 ApplicationContext는 생성합니다.)
+3. 생성된 ContextLoaderListener 는 applicationContext.xml을 로딩하여 스프링 IoC Container에 해당하는 ApplicationContext 생성합니다.
+- 또한 applicationContext.xml 에 등록된 bean들이 생성되어 IoC Container에 저장됩니다.
+- 이때 생성되는 bean들은 웹과 관련없는 객체들입니다.
 - 예를 들어, DB에 접근하기 위한 객체인 repository나 databaseDataSource 클래스 객체를 생성합니다.
+- applicationContext.xml 코드 예시입니다.
+```
+<context:component-scan base-package="/basepacakge주소">
+        <context:include-filter type="annotation" 
+                                expression="org.springframework.stereotype.Repository"/>
+        <context:include-filter type="annotation"
+                                expression="org.springframework.stereotype.Service"/>
+        <context:include-filter type="annotation"
+                                expression="org.springframework.stereotype.Component"/>
+        
+    </context:component-scan>
+```
+- context:component-scan 태그를 통해서 ContextLoaderListner내부의 ContextLoader가 bean 생성위해 스캔할 범위(base-package)를 지정합니다.
+- context:component-scan 태그의 하위태그로 include-filter태그를 추가하여 스캔할 대상을 지정합니다.
+- 위에서는 @Repository, @Service, @Component 어노테이션이 붙은 클래스를 스캔하여 bean으로 생성한다는 의미입니다.
+- 여기까지가 톰캣이 시작될 때 수행되는 과정입니다.
 
-4. 클라이언트로 부터 요청이 들어오면, application-dispatcherDispatcherServlet(servlet)이 생성됩니다.
+4. 클라이언트로 부터 요청이 들어오면, 만약 이 요청이 첫번째로 들어온 요청인 경우,  web.xml 에 설정된 dispatcherServelet(serlet)을 생성합니다.
+- 
 
-톰캣이 실행되면 톰캣의 설정 파일에 해당하는 web.xml을 읽고 개발자는 톰캣의 설정 파일인 web.xml에 <context-param> 태그를 이용하여 applicatonContext.xml의 경로를 전역변수로 만듭니다.
+톰캣이 실행되면 톰캣의 설정 파일에 해당하는 web.xml을 읽고 개발자는 톰캣의 설정 파일인 web.xml에 <context-param> 태그를 이용하여 applicatonContext.xml의 경로를 전역변수 contextConfigLocation로 만듭니다.
 (applicationContext.xml은 IoC Container에서 관리할 객체들을 지정해놓은 파일입니다.)
 	
-2. 톰캣이 실행되면, 
 
 
 
