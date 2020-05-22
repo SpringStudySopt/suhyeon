@@ -142,6 +142,29 @@ class OwnerController {
 - maven으로 빌드하면 생기는 jar 파일을 저장하는 곳입니다.
 - 개발할 때는 중요하지 않지만, jar파일을 실제 서버에 반영할 때 target 디렉터리안에 잇는 jar 파일이나 war 파일을 배포하게 됩니다.
 
+## 동작 과정
+1. 웹 어플리케이션이 실행되면, ServletContainter(ex. 톰캣 서버)이 자신의 설정 파일인 web.xml을 로딩합니다.
+2. web.xml 등록되어있는 ContextLoaderListener (Java ClasS)의 인스턴스가 메모리에 생성됩니다.
+- web.xml 등록된 ContextLoaderListner 코드 
+```
+<listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+```
+- ContextLoaderListner는 ServletContextListenr 인터페이스를 구현하고 있으며, ApplicationContext를 생성하는 역할을 합니다.
+3. 생성된 ContextLoaderListener 는 root-context.xml을 loading 합니다.
+- root-context.xml에 등록되어있는 Root Application Context 컨테이너가 생성됩니다.
+- 이 Container는 root-context.xml(우리 프로젝트에서는 applicationContext.xml에 해당)에 지정되어있는 bean들을 생성하여 저장합니다.
+- 주로 이 bean들은 웹과 관련없는 객체들입니다.
+- 예를 들어, DB에 접근하기 위한 객체인 repository나 databaseDataSource 클래스 객체를 생성합니다.
+
+4. 클라이언트로 부터 요청이 들어오면, application-dispatcherDispatcherServlet(servlet)이 생성됩니다.
+
+톰캣이 실행되면 톰캣의 설정 파일에 해당하는 web.xml을 읽고 개발자는 톰캣의 설정 파일인 web.xml에 <context-param> 태그를 이용하여 applicatonContext.xml의 경로를 전역변수로 만듭니다.
+(applicationContext.xml은 IoC Container에서 관리할 객체들을 지정해놓은 파일입니다.)
+	
+2. 톰캣이 실행되면, 
+
 
 
 
@@ -156,4 +179,5 @@ class OwnerController {
 
 >>http://lazyrodi.github.io/2017/09/03/2017-09-03-spring-structure/
 
->>https://victorydntmd.tistory.com/161
+>>https://doublesprogramming.tistory.com/84
+
